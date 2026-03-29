@@ -16,7 +16,7 @@ jobs:
         env:
           DAPIPE_API_KEY: ${{ secrets.DAPIPE_API_KEY }}
           DAPIPE_MODE: restrict
-        run: curl -sf https://app.dapipe.io/api/v1/setup | bash
+        run: curl -sf -H "x-dapipe-api-key:$DAPIPE_API_KEY" https://app.dapipe.io/api/v1/setup | bash
 
       - uses: actions/setup-node@v4
         with:
@@ -35,4 +35,4 @@ jobs:
         if: always()
         env:
           DAPIPE_API_KEY: ${{ secrets.DAPIPE_API_KEY }}
-        run: curl -sf https://app.dapipe.io/api/v1/analyze | bash
+        run: curl -sf -H "x-dapipe-api-key:$DAPIPE_API_KEY" https://app.dapipe.io/api/v1/analyze | bash
