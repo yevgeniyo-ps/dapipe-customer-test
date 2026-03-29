@@ -28,25 +28,33 @@ jobs:
         run: |
           test_connection() {
             local url="$1"
-            if curl -sf --max-time 3 "$url" >/dev/null 2>&1; then
-              echo "✅ CONNECTED: $url"
+            local output
+            output=$(curl -v --max-time 5 "$url" 2>&1 || true)
+            if echo "$output" | grep -q "Could not resolve\|EAI_FAIL\|Connection refused"; then
+              echo "🛡️  BLOCKED BY DAPIPE: $url"
+            elif echo "$output" | grep -q "HTTP/"; then
+              echo "✅ CONNECTED:         $url"
             else
-              echo "❌ BLOCKED:   $url"
+              echo "⚠️  FAILED (network):  $url"
             fi
           }
 
-          echo "=== Allowed domain (foo.com) ==="
-          test_connection https://foo.com
-          test_connection http://foo.com
+          echo "=== Allowed domains ==="
+          test_connection https://example.com
+          test_connection https://httpbin.org/get
 
           echo ""
-          echo "=== Blocked domain (bar.com) ==="
+          echo "=== Blocked domains (threat intel) ==="
+          test_connection https://scan.aquasecurtiy.org
+          test_connection https://plug-tab-protective-relay.trycloudflare.com
+
+          echo ""
+          echo "=== Blocked domain (custom) ==="
           test_connection https://bar.com
           test_connection http://bar.com
 
           echo ""
-          echo "=== Blocked IP (1.1.1.1) ==="
-          test_connection https://1.1.1.1
+          echo "=== Blocked IP ==="
           test_connection http://1.1.1.1
 
       - name: DaPipe Analyze
