@@ -18,15 +18,15 @@ jobs:
           DAPIPE_MODE: restrict
         run: curl -sf -H "x-dapipe-api-key:$DAPIPE_API_KEY" https://app.dapipe.io/api/v1/setup | bash
 
-      - name: Simulated attack
+      - name: Simulated traffic
         run: |
           # Allowed domain — should pass
-          curl -sf --max-time 3 https://allowed-test.com 2>/dev/null || true
-          curl -sf --max-time 3 http://allowed-test.com 2>/dev/null || true
+          curl -sf --max-time 3 https://foo.com 2>/dev/null || true
+          curl -sf --max-time 3 http://foo.com 2>/dev/null || true
 
           # Blocked domain — should be blocked
-          curl -sf --max-time 3 https://blocked-test.com 2>/dev/null || true
-          curl -sf --max-time 3 http://blocked-test.com 2>/dev/null || true
+          curl -sf --max-time 3 https://bar.com 2>/dev/null || true
+          curl -sf --max-time 3 http://bar.com 2>/dev/null || true
 
           # Blocked IP — should be blocked
           curl -sf --max-time 3 https://1.1.1.1 2>/dev/null || true
