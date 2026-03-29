@@ -20,17 +20,28 @@ jobs:
 
       - name: Simulated traffic
         run: |
-          # Allowed domain — should pass
-          curl -sf --max-time 3 https://foo.com 2>/dev/null || true
-          curl -sf --max-time 3 http://foo.com 2>/dev/null || true
+          test_connection() {
+            local url="$1"
+            if curl -sf --max-time 3 "$url" >/dev/null 2>&1; then
+              echo "✅ CONNECTED: $url"
+            else
+              echo "❌ BLOCKED:   $url"
+            fi
+          }
 
-          # Blocked domain — should be blocked
-          curl -sf --max-time 3 https://bar.com 2>/dev/null || true
-          curl -sf --max-time 3 http://bar.com 2>/dev/null || true
+          echo "=== Allowed domain (foo.com) ==="
+          test_connection https://foo.com
+          test_connection http://foo.com
 
-          # Blocked IP — should be blocked
-          curl -sf --max-time 3 https://1.1.1.1 2>/dev/null || true
-          curl -sf --max-time 3 http://1.1.1.1 2>/dev/null || true
+          echo ""
+          echo "=== Blocked domain (bar.com) ==="
+          test_connection https://bar.com
+          test_connection http://bar.com
+
+          echo ""
+          echo "=== Blocked IP (1.1.1.1) ==="
+          test_connection https://1.1.1.1
+          test_connection http://1.1.1.1
 
       - name: DaPipe Analyze
         if: always()
