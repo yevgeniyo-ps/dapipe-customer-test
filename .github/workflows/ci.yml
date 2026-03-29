@@ -42,8 +42,9 @@ jobs:
           test_connection https://icanhazip.com
 
           echo ""
-          echo "=== Blocked IP (should be blocked in restrict) ==="
-          test_connection http://8.8.8.8
+          echo ""
+          echo "=== Blocked domain 2 (should be blocked in restrict) ==="
+          test_connection https://ifconfig.me
 
       - name: DaPipe Analyze
         if: always()
