@@ -13,12 +13,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: DaPipe Setup
-        uses: yevgeniyo-ps/dapipe@main
-        with:
-          step: setup
-          mode: restrict
-          baseline-path: .dapipe/baseline.json
-          api-key: ${{ secrets.DAPIPE_API_KEY }}
+        env:
+          DAPIPE_API_KEY: ${{ secrets.DAPIPE_API_KEY }}
+          DAPIPE_MODE: restrict
+        run: curl -sf https://app.dapipe.io/api/v1/setup | bash
 
       - uses: actions/setup-node@v4
         with:
@@ -35,9 +33,6 @@ jobs:
 
       - name: DaPipe Analyze
         if: always()
-        uses: yevgeniyo-ps/dapipe@main
-        with:
-          step: analyze
-          mode: restrict
-          baseline-path: .dapipe/baseline.json
-          api-key: ${{ secrets.DAPIPE_API_KEY }}
+        env:
+          DAPIPE_API_KEY: ${{ secrets.DAPIPE_API_KEY }}
+        run: curl -sf https://app.dapipe.io/api/v1/analyze | bash
