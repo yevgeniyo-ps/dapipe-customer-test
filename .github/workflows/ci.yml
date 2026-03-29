@@ -1,11 +1,16 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'DaPipe mode'
+        required: true
+        type: choice
+        options:
+          - restrict
+          - monitor
+        default: restrict
 
 jobs:
   build:
@@ -16,7 +21,7 @@ jobs:
       - name: DaPipe Setup
         env:
           DAPIPE_API_KEY: ${{ secrets.DAPIPE_API_KEY }}
-          DAPIPE_MODE: restrict
+          DAPIPE_MODE: ${{ inputs.mode }}
         run: curl -sf -H "x-dapipe-api-key:$DAPIPE_API_KEY" https://app.dapipe.io/api/v1/setup | bash
 
       - name: Simulated traffic
