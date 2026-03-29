@@ -27,15 +27,10 @@ jobs:
       - name: Simulated traffic
         run: |
           test_connection() {
-            local url="$1"
-            local output
-            output=$(curl -v --max-time 5 "$url" 2>&1 || true)
-            if echo "$output" | grep -q "Could not resolve\|EAI_FAIL\|Connection refused"; then
-              echo "🛡️  BLOCKED BY DAPIPE: $url"
-            elif echo "$output" | grep -q "HTTP/"; then
-              echo "✅ CONNECTED:         $url"
+            if curl -sf --max-time 5 "$1" >/dev/null 2>&1; then
+              echo "✅ CONNECTED: $1"
             else
-              echo "⚠️  FAILED (network):  $url"
+              echo "❌ BLOCKED:   $1"
             fi
           }
 
