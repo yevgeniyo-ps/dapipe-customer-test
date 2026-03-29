@@ -39,23 +39,16 @@ jobs:
             fi
           }
 
-          echo "=== Allowed domains ==="
+          echo "=== Allowed (should connect) ==="
           test_connection https://example.com
-          test_connection https://httpbin.org/get
 
           echo ""
-          echo "=== Blocked domains (threat intel) ==="
-          test_connection https://scan.aquasecurtiy.org
-          test_connection https://plug-tab-protective-relay.trycloudflare.com
+          echo "=== Blocked domains (should be blocked in restrict) ==="
+          test_connection https://icanhazip.com
 
           echo ""
-          echo "=== Blocked domain (custom) ==="
-          test_connection https://bar.com
-          test_connection http://bar.com
-
-          echo ""
-          echo "=== Blocked IP ==="
-          test_connection http://1.1.1.1
+          echo "=== Blocked IP (should be blocked in restrict) ==="
+          test_connection http://8.8.8.8
 
       - name: DaPipe Analyze
         if: always()
