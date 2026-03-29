@@ -48,6 +48,7 @@ jobs:
           echo ""
           echo "=== Blocked IP (should be blocked in restrict) ==="
           test_connection https://1.1.1.1
+          test_connection https://1.1.1.2
 
       - name: DaPipe Analyze
         if: always()
